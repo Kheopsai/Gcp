@@ -7,10 +7,12 @@ resource "google_service_account" "mig-sa" {
 data "google_compute_image" "ubuntu" {
   family  = "ubuntu-2204-lts"
   project = "ubuntu-os-cloud"
+
 }
 
 resource "google_compute_instance_template" "mig-v1-template" {
-  machine_type = "e2-highmem-4"
+  # machine_type = "e2-highmem-4"
+  machine_type = "e2-micro"
   name         = "mig-v1-template"
   description  = "Instance template for MIG"
   project      = var.project_id
@@ -22,8 +24,9 @@ resource "google_compute_instance_template" "mig-v1-template" {
   }
 
   network_interface {
-    network = "prod-vpc"
+    network    = "prod-vpc"
     subnetwork = "prod-subnet"
+
   }
 
   scheduling {
@@ -37,4 +40,6 @@ resource "google_compute_instance_template" "mig-v1-template" {
   }
 
   metadata_startup_script = file("${path.module}/scripts/startup.sh")
+  tags = ["http-server"]
+
 }
