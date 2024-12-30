@@ -7,7 +7,6 @@ resource "google_service_account" "mig-sa" {
 data "google_compute_image" "ubuntu" {
   family  = "ubuntu-2204-lts"
   project = "ubuntu-os-cloud"
-
 }
 
 resource "google_compute_instance_template" "mig-v1-template" {
@@ -36,10 +35,10 @@ resource "google_compute_instance_template" "mig-v1-template" {
 
   service_account {
     scopes = ["cloud-platform"]
-    email = google_service_account.mig-sa.email
+    email  = google_service_account.mig-sa.email
   }
 
   metadata_startup_script = file("${path.module}/scripts/startup.sh")
-  tags = ["http-server"]
+  tags                    = ["http-server"]
 
 }
