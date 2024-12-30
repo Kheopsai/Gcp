@@ -20,11 +20,13 @@ resource "google_compute_instance_template" "mig-v1-template" {
     source_image = data.google_compute_image.ubuntu.self_link
     boot         = true
     auto_delete  = true
+    # disk_size_gb = 100
+    # disk_type = "pd-ssd"
   }
 
   network_interface {
-    network    = "prod-vpc"
-    subnetwork = "prod-subnet"
+    network    = var.network
+    subnetwork = var.subnet
 
   }
 
@@ -42,3 +44,8 @@ resource "google_compute_instance_template" "mig-v1-template" {
   tags                    = ["http-server"]
 
 }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> d59d9ae1b52ebc019f4add8f202986e25164c7e9
