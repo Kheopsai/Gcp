@@ -23,7 +23,6 @@ resource "google_compute_region_instance_group_manager" "mig" {
     name              = "v1"
   }
 
-  target_size = 1
 
   named_port {
     name = "http"
