@@ -44,8 +44,3 @@ resource "google_compute_instance_template" "mig-v1-template" {
   tags                    = ["http-server"]
 
 }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> d59d9ae1b52ebc019f4add8f202986e25164c7e9
