@@ -1,6 +1,21 @@
 resource "google_compute_url_map" "mig-url-map" {
   name            = "mig-url-map"
   default_service = var.backend_service_id
+  host_rule {
+    hosts = ["*.kheops.ai", "kheops.ai"]
+    path_matcher = "allpaths"
+  }
+
+  path_matcher {
+    name            = "allpaths"
+    default_service = var.backend_service_id
+
+    path_rule {
+      paths = ["/*"]
+      service = var.backend_service_id
+    }
+  }
+
 }
 
 resource "google_compute_target_https_proxy" "mig-https-lb-proxy" {
