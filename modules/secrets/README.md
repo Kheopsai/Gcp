@@ -25,9 +25,10 @@ This module uses Google Cloud Key Management Service (KMS) to securely store and
 ├── kms.tf         # Contains the KMS key ring and crypto key definitions.
 ├── outputs.tf     # Defines outputs for the module.
 ├── variables.tf   # Contains input variables for the module.
+├── certificates.tf # Contains resources for managing encrypted certificates.
 ```
 
-## Terraform Resources
+## Key Management Service (KMS) Resources
 
 ### Key Ring
 The `google_kms_key_ring` resource creates a key ring for organizing your KMS keys.
@@ -116,66 +117,10 @@ gcloud kms decrypt \
 
 Replace `<OUTPUT_FILE>` with the path to store the decrypted file and `<FILE_TO_DECRYPT>` with the path to the encrypted file.
 
-# Encrypting Certificates with Google Cloud KMS
-
-This module uses Google Cloud Key Management Service (KMS) to securely store and manage encryption keys, which are used to encrypt certificates. It includes Terraform resources to create a KMS key ring and a crypto key, and also provides instructions for encrypting the certificates.
-
-## Prerequisites
-
-1. Ensure you have a Google Cloud project with billing enabled.
-2. Install the following tools:
-   - [Terraform](https://www.terraform.io/downloads.html)
-   - [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
-3. Authenticate with Google Cloud:
-   ```bash
-   gcloud auth application-default login
-   ```
-
-## Module Structure
-
-```plaintext
-├── http-certificates
-│   ├── AAACertificateServices.crt
-│   ├── STAR_kheops_ai.crt
-│   ├── SectigoRSADomainValidationSecureServerCA.crt
-│   ├── USERTrustRSAAAACA.crt
-│   └── wildcard.kheops.ai.key
-├── kms.tf         # Contains the KMS key ring and crypto key definitions.
-├── outputs.tf     # Defines outputs for the module.
-├── variables.tf   # Contains input variables for the module.
-├── certificates.tf # Contains resources for managing encrypted certificates.
-```
-
-## Terraform Resources
-
-### Key Ring
-The `google_kms_key_ring` resource creates a key ring for organizing your KMS keys.
-
-```hcl
-resource "google_kms_key_ring" "certs" {
-  name     = "certs-key-ring"
-  location = var.location
-}
-```
-
-### Crypto Key
-The `google_kms_crypto_key` resource defines a cryptographic key for encryption and decryption. The `prevent_destroy` lifecycle rule ensures the key cannot be accidentally destroyed.
-
-```hcl
-resource "google_kms_crypto_key" "certs" {
-  name     = "certs-crypto-key"
-  key_ring = google_kms_key_ring.certs.id
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-```
-
 ### Certificate Management
 The `google_kms_secret_ciphertext` resources are used to decrypt the certificate files. The decrypted data is then used to create a Google Compute SSL certificate resource.
 
-#### Encrypting Certificates
+#### Decrypting Certificates with Terraform
 ```hcl
 resource "google_kms_secret_ciphertext" "AAACertificateServices" {
    crypto_key = google_kms_crypto_key.certs.id
@@ -209,7 +154,7 @@ The certificates are combined using Terraform local variables to create a single
 
 ```hcl
 locals {
-   public_key_certificate = join("\n", [
+   public_key_certificate = join("", [
       google_kms_secret_ciphertext.STAR_kheops_ai.plaintext,
       google_kms_secret_ciphertext.SectigoRSADomainValidationSecureServerCA.plaintext,
       google_kms_secret_ciphertext.USERTrustRSAAAACA.plaintext,
