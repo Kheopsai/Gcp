@@ -7,7 +7,7 @@ module "mig" {
 }
 
 module "loadbalancer" {
-  source = "./modules/loadbalancer"
+  source             = "./modules/loadbalancer"
   backend_service_id = module.mig.backend_service_id
 }
 
@@ -17,4 +17,9 @@ module "memory_store" {
   region     = var.region
   network    = var.network
   subnet     = var.subnet
+}
+
+module "secrets" {
+  source   = "./modules/secrets"
+  location = var.region
 }
