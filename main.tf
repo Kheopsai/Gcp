@@ -25,3 +25,10 @@ module "memory_store" {
   subnet     = var.subnet
 }
 
+module "postgres" {
+  source     = "./modules/postgres"
+  project_id = var.project_id
+  region     = var.region
+  network    = var.network
+  subnet     = var.subnet
+}
