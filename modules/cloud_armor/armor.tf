@@ -58,7 +58,7 @@ module "armor_security_policy" {
   }
 
   # Threat Intelligence Rules
-
+  /*
   threat_intelligence_rules = {
 
     deny_malicious_ips = {
@@ -78,5 +78,5 @@ module "armor_security_policy" {
       feed        = "iplist-tor-exit-nodes"
     }
   }
-
+*/
 }
