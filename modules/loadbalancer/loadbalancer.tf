@@ -2,7 +2,7 @@ resource "google_compute_url_map" "mig-url-map" {
   name            = "mig-url-map"
   default_service = var.backend_service_id
   host_rule {
-    hosts        = ["*.kheops.ai", "kheops.ai"]
+    hosts = ["*.kheops.ai", "kheops.ai"]
     path_matcher = "allpaths"
   }
 
@@ -11,11 +11,10 @@ resource "google_compute_url_map" "mig-url-map" {
     default_service = var.backend_service_id
 
     path_rule {
-      paths   = ["/*"]
+      paths = ["/*"]
       service = var.backend_service_id
     }
   }
-
 }
 
 resource "google_compute_target_https_proxy" "mig-https-lb-proxy" {
@@ -24,7 +23,6 @@ resource "google_compute_target_https_proxy" "mig-https-lb-proxy" {
   ssl_certificates = [
     var.ssl_certificate_self_link
   ]
-  security_policy = module.armor_security_policy.policy.self_link
 }
 
 resource "google_compute_global_forwarding_rule" "mig-http-lb-rule" {

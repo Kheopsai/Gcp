@@ -16,3 +16,8 @@ variable "subnet" {
   description = "The subnet to deploy the MIG"
   type        = string
 }
+
+variable "cloud_armor_security_policy_self_link" {
+  description = "The self link of the Cloud Armor security policy"
+  type        = string
+}

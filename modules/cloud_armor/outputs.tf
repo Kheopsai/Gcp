@@ -1,5 +1,5 @@
 output "security_policy" {
-  value       = module.armor_security_policy.policy
+  value       = module.armor_security_policy.policy.self_link
   description = "Cloud Armor security policy created"
 }
 

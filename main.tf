@@ -9,6 +9,7 @@ module "mig" {
   region     = var.region
   network    = var.network
   subnet     = var.subnet
+  cloud_armor_security_policy_self_link = module.armor.security_policy
 }
 
 module "loadbalancer" {
