@@ -5,13 +5,13 @@ resource "google_compute_region_instance_group_manager" "mig" {
   region             = var.region
 
   version {
-    instance_template = module.v1.instance_template
-    name              = "v1"
+    instance_template = module.v3.instance_template
+    name              = "v3"
   }
 
   update_policy {
-    type                           = "PROACTIVE"
-    minimal_action                 = "REPLACE"
+    type           = "PROACTIVE"
+    minimal_action = "REPLACE"
   }
   named_port {
     name = "http"

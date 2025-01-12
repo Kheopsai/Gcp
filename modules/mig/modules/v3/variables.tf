@@ -16,3 +16,8 @@ variable "subnet" {
   description = "The subnet to deploy the MIG"
   type        = string
 }
+
+variable "service_account_email" {
+  description = "The service account of the template"
+  type        = string
+}
