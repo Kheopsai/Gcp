@@ -1,37 +1,37 @@
-resource "google_kms_secret_ciphertext" "AAACertificateServices" {
+data "google_kms_secret" "AAACertificateServices" {
   crypto_key = google_kms_crypto_key.certs.id
-  plaintext = file("${path.module}/http-certificates/AAACertificateServices.crt")
+  ciphertext = filebase64("${path.module}/http-certificates/AAACertificateServices.crt.enc")
 }
 
-resource "google_kms_secret_ciphertext" "STAR_kheops_ai" {
+data "google_kms_secret" "STAR_kheops_ai" {
   crypto_key = google_kms_crypto_key.certs.id
-  plaintext = file("${path.module}/http-certificates/STAR_kheops_ai.crt")
+  ciphertext = filebase64("${path.module}/http-certificates/STAR_kheops_ai.crt.enc")
 }
 
-resource "google_kms_secret_ciphertext" "SectigoRSADomainValidationSecureServerCA" {
+data "google_kms_secret" "SectigoRSADomainValidationSecureServerCA" {
   crypto_key = google_kms_crypto_key.certs.id
-  plaintext = file("${path.module}/http-certificates/SectigoRSADomainValidationSecureServerCA.crt")
+  ciphertext = filebase64("${path.module}/http-certificates/SectigoRSADomainValidationSecureServerCA.crt.enc")
 }
 
-resource "google_kms_secret_ciphertext" "USERTrustRSAAAACA" {
+data "google_kms_secret" "USERTrustRSAAAACA" {
   crypto_key = google_kms_crypto_key.certs.id
-  plaintext = file("${path.module}/http-certificates/USERTrustRSAAAACA.crt")
+  ciphertext = filebase64("${path.module}/http-certificates/USERTrustRSAAAACA.crt.enc")
 }
 
-resource "google_kms_secret_ciphertext" "wildcard_kheops_ai_private_key" {
+data "google_kms_secret" "wildcard_kheops_ai_private_key" {
   crypto_key = google_kms_crypto_key.certs.id
-  plaintext = file("${path.module}/http-certificates/wildcard.kheops.ai.key")
+  ciphertext = filebase64("${path.module}/http-certificates/wildcard.kheops.ai.key.enc")
 }
 
 locals {
   public_key_certificate = join("", [
-    google_kms_secret_ciphertext.STAR_kheops_ai.plaintext,
-    google_kms_secret_ciphertext.SectigoRSADomainValidationSecureServerCA.plaintext,
-    google_kms_secret_ciphertext.USERTrustRSAAAACA.plaintext,
-    google_kms_secret_ciphertext.AAACertificateServices.plaintext,
+    data.google_kms_secret.STAR_kheops_ai.plaintext,
+    data.google_kms_secret.SectigoRSADomainValidationSecureServerCA.plaintext,
+    data.google_kms_secret.USERTrustRSAAAACA.plaintext,
+    data.google_kms_secret.AAACertificateServices.plaintext,
   ])
 
-  private_key_certificate = google_kms_secret_ciphertext.wildcard_kheops_ai_private_key.plaintext
+  private_key_certificate = data.google_kms_secret.wildcard_kheops_ai_private_key.plaintext
 }
 
 
