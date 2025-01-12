@@ -4,12 +4,13 @@ resource "google_sql_database_instance" "postgres_instance" {
   region           = var.region
 
   settings {
-    tier = "db-f1-micro" # Ajustez la taille selon vos besoins
-    availability_type = "REGIONAL"        # Activer HA
+    tier              = "db-standard-4"
+    edition           = "ENTERPRISE"
+    availability_type = "REGIONAL"
 
     backup_configuration {
       enabled                        = true
-      start_time = "03:00" # Heure de début des sauvegardes automatiques
+      start_time                     = "03:00" # Heure de début des sauvegardes automatiques
       location                       = var.region
       point_in_time_recovery_enabled = true # Récupération à un instant donné
     }
