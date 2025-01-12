@@ -32,3 +32,12 @@ module "postgres" {
   network    = var.network
   subnet     = var.subnet
 }
+
+
+module "armor" {
+  source     = "./modules/cloud_armor"
+  project_id = var.project_id
+  region     = var.region
+  network    = var.network
+  subnet     = var.subnet
+}
