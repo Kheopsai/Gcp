@@ -27,8 +27,10 @@ jobs:
         id: vars
         run: |-
           cat > pipeline.auto.tfvars <<EOF
-          project="${{ vars.GCP_PROJECT }}" 
-          region="${{ vars.GCP_REGION }}"
+          project_id = "${{ vars.GCP_PROJECT }}"
+          region     = "${{ vars.GCP_REGION }}"
+          network    = "${{ vars.GCP_NETWORK }}"
+          subnet     = "${{ vars.GCP_SUBNET }}"
           EOF
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
