@@ -9,13 +9,17 @@ resource "google_sql_database_instance" "postgres-pgvector-main-instance" {
   region           = var.region
 
   settings {
-    tier = "db-f1-micro"
-    edition = "ENTERPRISE"
+    tier              = "db-standard-4"
+    edition           = "ENTERPRISE"
     availability_type = "REGIONAL"
 
     backup_configuration {
-      enabled = true
-      binary_log_enabled = true
+      enabled                        = true
+      binary_log_enabled             = true
+      transaction_log_retention_days = 7
+      backup_retention_settings {
+        retained_backups = 3
+      }
     }
   }
 }
