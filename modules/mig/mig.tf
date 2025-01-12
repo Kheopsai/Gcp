@@ -5,8 +5,8 @@ resource "google_compute_region_instance_group_manager" "mig" {
   region             = var.region
 
   version {
-    instance_template = module.v3.instance_template
-    name              = "v3"
+    instance_template = module.v4.instance_template
+    name              = "v4"
   }
 
   update_policy {
@@ -23,7 +23,6 @@ resource "google_compute_region_instance_group_manager" "mig" {
     initial_delay_sec = 300
   }
   wait_for_instances = true
-
 }
 
 

@@ -23,3 +23,11 @@ module "v3" {
   subnet                = var.subnet
   service_account_email = google_service_account.mig-sa.email
 }
+module "v4" {
+  source                = "./modules/v4"
+  project_id            = var.project_id
+  network               = var.network
+  region                = var.region
+  subnet                = var.subnet
+  service_account_email = google_service_account.mig-sa.email
+}
