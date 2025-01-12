@@ -11,7 +11,7 @@ module "armor_security_policy" {
   layer_7_ddos_defense_rule_visibility = "STANDARD"
 
   # Adaptable
-  adaptive_protection_auto_deploy = {
+  /*adaptive_protection_auto_deploy = {
     enable   = true
     priority = 100000
     action   = "throttle"
@@ -22,7 +22,7 @@ module "armor_security_policy" {
       rate_limit_http_request_interval_sec = 120
       enforce_on_key                       = "IP"
     }
-  }
+  }*/
 
   # Pre-configured WAF Rules
 
