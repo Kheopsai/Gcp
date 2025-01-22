@@ -4,7 +4,7 @@ resource "google_sql_database_instance" "postgres_instance" {
   region           = var.region
 
   settings {
-    tier = "db-f1-micro" # Ajustez la taille selon vos besoins
+    tier              = "e2-highmem-4" # Ajustez la taille selon vos besoins
     availability_type = "REGIONAL"
 
     backup_configuration {
@@ -17,6 +17,41 @@ resource "google_sql_database_instance" "postgres_instance" {
     ip_configuration {
       ipv4_enabled    = false
       private_network = data.google_compute_network.prod-network.self_link
+    }
+
+    database_flags {
+      name  = "effective_cache_size"
+      value = "2700"
+    }
+
+    database_flags {
+      name  = "maintenance_work_mem"
+      value = "300"
+    }
+
+    database_flags {
+      name  = "max_connections"
+      value = "1500"
+    }
+
+    database_flags {
+      name  = "max_parallel_workers"
+      value = "8"
+    }
+
+    database_flags {
+      name  = "max_parallel_workers_per_gather"
+      value = "2"
+    }
+
+    database_flags {
+      name  = "work_mem"
+      value = "8"
+    }
+
+    database_flags {
+      name  = "force_parallel_mode"
+      value = "on"
     }
   }
   depends_on = [google_service_networking_connection.database_connection]
