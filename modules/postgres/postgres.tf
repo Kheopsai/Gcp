@@ -44,10 +44,10 @@ resource "google_sql_database_instance" "postgres_instance" {
       value = "2"
     }
 
-    database_flags {
+    /*database_flags {
       name  = "work_mem"
       value = "8"
-    }
+      }*/
 
     database_flags {
       name  = "force_parallel_mode"
