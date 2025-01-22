@@ -4,7 +4,7 @@ resource "google_sql_database_instance" "postgres_instance" {
   region           = var.region
 
   settings {
-    tier              = "db-n1-standard-4" # Ajustez la taille selon vos besoins
+    tier              = "db-custom-4-16384"
     availability_type = "REGIONAL"
 
     backup_configuration {
