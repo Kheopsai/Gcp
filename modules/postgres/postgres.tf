@@ -26,12 +26,12 @@ resource "google_sql_database_instance" "postgres_instance" {
 
     database_flags {
       name  = "work_mem"
-      value = "4096"
+      value = "419430"
     }
 
     database_flags {
       name  = "shared_buffers"
-      value = "4096"
+      value = "419430"
     }
 
     database_flags {
