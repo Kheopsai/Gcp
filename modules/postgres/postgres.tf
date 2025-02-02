@@ -19,30 +19,32 @@ resource "google_sql_database_instance" "postgres_instance" {
       private_network = data.google_compute_network.prod-network.self_link
     }
 
+
     database_flags {
       name  = "maintenance_work_mem"
-      value = "524288000"
+      value = "536870912"
     }
 
     database_flags {
       name  = "work_mem"
-      value = "4096000"
+      value = "4194304"
     }
 
     database_flags {
       name  = "shared_buffers"
-      value = "4096000"
+      value = "4194304"
     }
 
     database_flags {
       name  = "effective_cache_size"
-      value = "12288000"
+      value = "12582912"
     }
 
     database_flags {
       name  = "max_connections"
       value = "150"
     }
+
   }
   depends_on = [google_service_networking_connection.database_connection]
 }
