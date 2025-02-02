@@ -20,38 +20,28 @@ resource "google_sql_database_instance" "postgres_instance" {
     }
 
     database_flags {
-      name  = "effective_cache_size"
-      value = "2700"
+      name  = "maintenance_work_mem"
+      value = "524288"
     }
 
     database_flags {
-      name  = "maintenance_work_mem"
-      value = "300"
+      name  = "work_mem"
+      value = "4096"
+    }
+
+    database_flags {
+      name  = "shared_buffers"
+      value = "4096"
+    }
+
+    database_flags {
+      name  = "effective_cache_size"
+      value = "12288"
     }
 
     database_flags {
       name  = "max_connections"
-      value = "1500"
-    }
-
-    database_flags {
-      name  = "max_parallel_workers"
-      value = "8"
-    }
-
-    database_flags {
-      name  = "max_parallel_workers_per_gather"
-      value = "2"
-    }
-
-    /*database_flags {
-      name  = "work_mem"
-      value = "8"
-      }*/
-
-    database_flags {
-      name  = "force_parallel_mode"
-      value = "on"
+      value = "150"
     }
   }
   depends_on = [google_service_networking_connection.database_connection]
