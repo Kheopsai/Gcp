@@ -21,22 +21,22 @@ resource "google_sql_database_instance" "postgres_instance" {
 
     database_flags {
       name  = "maintenance_work_mem"
-      value = "524288"
+      value = "524288000"
     }
 
     database_flags {
       name  = "work_mem"
-      value = "419430"
+      value = "4096000"
     }
 
     database_flags {
       name  = "shared_buffers"
-      value = "419430"
+      value = "4096000"
     }
 
     database_flags {
       name  = "effective_cache_size"
-      value = "12288"
+      value = "12288000"
     }
 
     database_flags {
