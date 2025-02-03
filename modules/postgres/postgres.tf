@@ -37,7 +37,7 @@ resource "google_sql_database_instance" "postgres_instance" {
 
     database_flags {
       name  = "effective_cache_size"
-      value = "12288000"
+      value = "1536000" # Block de 8ko
     }
 
     database_flags {
