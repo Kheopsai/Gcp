@@ -11,7 +11,7 @@ resource "google_compute_instance_template" "mig-template" {
   project      = var.project_id
 
   disk {
-    source_image = data.google_compute_image.ubuntu.self_link
+    source_image = "projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20250112"
     boot         = true
     auto_delete  = true
     # disk_size_gb = 100

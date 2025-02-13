@@ -4,11 +4,11 @@ module "secrets" {
 }
 
 module "mig" {
-  source     = "./modules/mig"
-  project_id = var.project_id
-  region     = var.region
-  network    = var.network
-  subnet     = var.subnet
+  source                                = "./modules/mig"
+  project_id                            = var.project_id
+  region                                = var.region
+  network                               = var.network
+  subnet                                = var.subnet
   cloud_armor_security_policy_self_link = module.armor.security_policy
 }
 
@@ -37,6 +37,14 @@ module "postgres" {
 
 module "armor" {
   source     = "./modules/cloud_armor"
+  project_id = var.project_id
+  region     = var.region
+  network    = var.network
+  subnet     = var.subnet
+}
+
+module "dns" {
+  source     = "./modules/dns"
   project_id = var.project_id
   region     = var.region
   network    = var.network
