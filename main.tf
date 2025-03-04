@@ -55,17 +55,6 @@ module "dns" {
 # Kheops cloud
 ###############################
 
-provider "restful" {
-  base_url = var.kheops_url
-  security = {
-    http = {
-      token = {
-        token = "Bearer ${var.kheops_token}"
-      }
-    }
-  }
-  alias = "http_token"
-}
 
 variable "kheops_url" {
   description = "URL of the Kheops API"
@@ -102,7 +91,8 @@ variable "is_public" {
 ###############################
 
 data "http" "projects" {
-  url = "${var.kheops_url}/projects"
+  url    = "${var.kheops_url}/projects"
+  method = "GET"
   request_headers = {
     Authorization = "Bearer ${var.kheops_token}"
   }
@@ -113,38 +103,76 @@ locals {
   project_exists    = length([for p in local.existing_projects : p if try(p.name, "") == var.project_name]) > 0
   project_id_kheops = local.project_exists ? (
   [for p in local.existing_projects : p if try(p.name, "") == var.project_name][0].project_id
-  ) : restful_resource.project[0].id
+  ) : null
+}
+resource "null_resource" "create_project" {
+  count = local.project_exists ? 0 : 1
+  triggers = {
+    always_run = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      curl -X POST "${var.kheops_url}/projects" \
+        -H "Authorization: Bearer ${var.kheops_token}" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "name": "${var.project_name}",
+          "description": "${var.project_description}",
+          "is_public": ${var.is_public}
+        }'
+    EOT
+  }
+}
+data "http" "project_creation_response" {
+  count  = local.project_exists ? 0 : 1
+  url    = "${var.kheops_url}/projects"
+  method = "GET"
+  request_headers = {
+    Authorization = "Bearer ${var.kheops_token}"
+  }
+
+  depends_on = [null_resource.create_project]
 }
 
-
-resource "restful_resource" "project" {
-  count = local.project_exists ? 0 : 1
-  path  = "/projects"
-  body         = {
-    name        = var.project_name
-    description = var.project_description
-    is_public   = var.is_public
-  }
+locals {
+  project_id_kheops_final = local.project_exists ? local.project_id_kheops : (
+  jsondecode(data.http.project_creation_response[0].response_body)[0].project_id
+  )
 }
 
 ###############################
 # Duplicate Instances to Kheops
 ###############################
+
 data "google_compute_region_instance_group" "mig_instances" {
   self_link = module.mig.instance_group
-  region     = var.region
+  region    = var.region
 }
 
 data "google_compute_instance" "instance_details" {
-  for_each     = toset(data.google_compute_region_instance_group.mig_instances.instances[*].instance)
-  self_link    = each.value
+  for_each  = toset(data.google_compute_region_instance_group.mig_instances.instances[*].instance)
+  self_link = each.value
 }
 
-resource "restful_resource" "server_registration" {
+resource "null_resource" "server_registration" {
   for_each = data.google_compute_instance.instance_details
-  path     = "/projects/${local.project_id_kheops}/servers"
-  body = {
-    name = each.value.name
-    ip   = each.value.network_interface[0].access_config[0].nat_ip
+
+  triggers = {
+    instance_ip = each.value.network_interface[0].access_config[0].nat_ip
   }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      curl -X POST "${var.kheops_url}/projects/${local.project_id_kheops_final}/servers" \
+        -H "Authorization: Bearer ${var.kheops_token}" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "name": "${each.value.name}",
+          "ip": "${each.value.network_interface[0].access_config[0].nat_ip}"
+        }'
+    EOT
+  }
+
+  depends_on = [null_resource.create_project]
 }

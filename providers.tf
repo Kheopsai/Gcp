@@ -17,10 +17,6 @@ terraform {
       source = "hashicorp/http"
       version = "3.4.0"
     }
-    restful = {
-      source = "magodo/restful"
-      version = "0.18.1"
-    }
   }
 }
 
