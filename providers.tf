@@ -13,6 +13,14 @@ terraform {
       source  = "hashicorp/local"
       version = "2.5.2"
     }
+    http = {
+      source = "hashicorp/http"
+      version = "3.4.0"
+    }
+    restapi = {
+      source  = "hashicorp/restapi"
+      version = "2.0.0"
+    }
   }
 }
 

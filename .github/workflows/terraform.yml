@@ -45,3 +45,8 @@ jobs:
         run: terraform plan -input=false
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        env:
+          TF_VAR_kheops_token: ${{ secrets.KHEOPS_API_KEY }}
