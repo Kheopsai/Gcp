@@ -47,3 +47,4 @@ jobs:
         run: terraform apply -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          TF_VAR_kheops_token: ${{ secrets.KHEOPS_API_KEY }}
