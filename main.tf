@@ -110,21 +110,21 @@ data "http" "projects" {
 
 locals {
   existing_projects = jsondecode(data.http.projects.response_body)
-  project_exists = length([for p in local.existing_projects : p if try(p.name, "") == var.project_name]) > 0
+  project_exists    = length([for p in local.existing_projects : p if try(p.name, "") == var.project_name]) > 0
   project_id_kheops = local.project_exists ? (
   [for p in local.existing_projects : p if try(p.name, "") == var.project_name][0].project_id
-  ) : restful_object.project[0].id
+  ) : restful_resource.project[0].id
 }
 
-resource "restful_object" "project" {
+
+resource "restful_resource" "project" {
   count = local.project_exists ? 0 : 1
   path  = "/projects"
-  data = jsonencode({
+  body         = {
     name        = var.project_name
     description = var.project_description
     is_public   = var.is_public
-  })
-  id_attribute = "project_id"
+  }
 }
 
 ###############################
@@ -134,9 +134,8 @@ resource "restful_object" "project" {
 resource "restful_object" "server_registration" {
   for_each = { for instance in module.mig.instances : instance.name => instance }
   path = "/projects/${local.project_id_kheops}/servers"
-  data = jsonencode({
+  body = {
     name = each.value.name
     ip   = each.value.ip
-  })
-  id_attribute = "server_id"
+  }
 }
