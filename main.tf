@@ -55,8 +55,7 @@ module "dns" {
 # Kheops cloud
 ###############################
 
-provider "restapi" {
-  uri                  = var.kheops_url
+provider "restful" {
   write_returns_object = true
   headers = {
     Authorization = "Bearer ${var.kheops_token}"
@@ -67,8 +66,8 @@ provider "restapi" {
   read_method    = "GET"
   update_method  = "PUT"
   destroy_method = "DELETE"
+  base_url       = var.kheops_url
 }
-
 
 
 variable "kheops_url" {
