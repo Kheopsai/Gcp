@@ -130,12 +130,19 @@ resource "restful_resource" "project" {
 ###############################
 # Duplicate Instances to Kheops
 ###############################
-
+data "google_compute_region_instance_group" "mig_instances" {
+  self_link = module.mig.instance_group
+  region     = var.region
+}
+data "google_compute_instance" "instance_details" {
+  for_each     = toset(data.google_compute_region_instance_group.mig_instances.instances)
+  self_link    = each.value
+}
 resource "restful_resource" "server_registration" {
-  for_each = { for instance in module.mig.instances : instance.name => instance }
-  path = "/projects/${local.project_id_kheops}/servers"
+  for_each = data.google_compute_instance.instance_details
+  path     = "/projects/${local.project_id_kheops}/servers"
   body = {
     name = each.value.name
-    ip   = each.value.ip
+    ip   = each.value.network_interface[0].access_config[0].nat_ip
   }
 }
