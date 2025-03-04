@@ -131,7 +131,7 @@ resource "restful_resource" "project" {
 # Duplicate Instances to Kheops
 ###############################
 
-resource "restful_object" "server_registration" {
+resource "restful_resource" "server_registration" {
   for_each = { for instance in module.mig.instances : instance.name => instance }
   path = "/projects/${local.project_id_kheops}/servers"
   body = {
