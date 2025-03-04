@@ -56,19 +56,16 @@ module "dns" {
 ###############################
 
 provider "restful" {
-  write_returns_object = true
-  headers = {
-    Authorization = "Bearer ${var.kheops_token}"
-    Content-Type  = "application/json"
-    Accept        = "application/json"
+  base_url = var.kheops_url
+  security = {
+    http = {
+      token = {
+        token = "Bearer ${var.kheops_token}"
+      }
+    }
   }
-  create_method  = "POST"
-  read_method    = "GET"
-  update_method  = "PUT"
-  destroy_method = "DELETE"
-  base_url       = var.kheops_url
+  alias = "http_token"
 }
-
 
 variable "kheops_url" {
   description = "URL of the Kheops API"
