@@ -134,10 +134,12 @@ data "google_compute_region_instance_group" "mig_instances" {
   self_link = module.mig.instance_group
   region     = var.region
 }
+
 data "google_compute_instance" "instance_details" {
-  for_each     = toset(data.google_compute_region_instance_group.mig_instances.instances)
+  for_each     = toset(data.google_compute_region_instance_group.mig_instances.instances[*].instance)
   self_link    = each.value
 }
+
 resource "restful_resource" "server_registration" {
   for_each = data.google_compute_instance.instance_details
   path     = "/projects/${local.project_id_kheops}/servers"
