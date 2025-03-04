@@ -18,8 +18,8 @@ terraform {
       version = "3.4.0"
     }
     restful = {
-      source  = "magodo/restful"
-      version = "2.0.0"
+      source = "magodo/restful"
+      version = "0.18.1"
     }
   }
 }
