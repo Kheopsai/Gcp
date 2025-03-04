@@ -121,10 +121,10 @@ locals {
   project_exists = length([for p in local.existing_projects : p if try(p.name, "") == var.project_name]) > 0
   project_id_kheops = local.project_exists ? (
   [for p in local.existing_projects : p if try(p.name, "") == var.project_name][0].project_id
-  ) : restapi_object.project[0].id
+  ) : restful_object.project[0].id
 }
 
-resource "restapi_object" "project" {
+resource "restful_object" "project" {
   count = local.project_exists ? 0 : 1
   path  = "/projects"
   data = jsonencode({
@@ -139,7 +139,7 @@ resource "restapi_object" "project" {
 # Duplicate Instances to Kheops
 ###############################
 
-resource "restapi_object" "server_registration" {
+resource "restful_object" "server_registration" {
   for_each = { for instance in module.mig.instances : instance.name => instance }
   path = "/projects/${local.project_id_kheops}/servers"
   data = jsonencode({
@@ -153,7 +153,7 @@ resource "restapi_object" "server_registration" {
 # Configure SSH Keys in Kheops
 ###############################
 
-resource "restapi_object" "ssh_key" {
+resource "restful_object" "ssh_key" {
   for_each = restapi_object.server_registration
   path = "/servers/${each.value.id}/ssh-keys"
   data = jsonencode({
