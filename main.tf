@@ -100,11 +100,6 @@ variable "is_public" {
   default     = false
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key to configure in Kheops instances"
-  type        = string
-}
-
 ###############################
 # Kheops Project Setup
 ###############################
@@ -147,17 +142,4 @@ resource "restful_object" "server_registration" {
     ip   = each.value.ip
   })
   id_attribute = "server_id"
-}
-
-###############################
-# Configure SSH Keys in Kheops
-###############################
-
-resource "restful_object" "ssh_key" {
-  for_each = restapi_object.server_registration
-  path = "/servers/${each.value.id}/ssh-keys"
-  data = jsonencode({
-    ssh_key = var.ssh_public_key
-  })
-  id_attribute = "key_id"
 }
