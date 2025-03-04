@@ -100,32 +100,45 @@ data "http" "projects" {
 
 locals {
   existing_projects = jsondecode(data.http.projects.response_body)
-  project_exists    = length([for p in local.existing_projects : p if try(p.name, "") == var.project_name]) > 0
+
+  project_exists = length([
+    for p in local.existing_projects : p
+    if try(p.name, "") == var.project_name
+  ]) > 0
+
   project_id_kheops = local.project_exists ? (
-  [for p in local.existing_projects : p if try(p.name, "") == var.project_name][0].project_id
+  [for p in local.existing_projects : p.project_id if p.name == var.project_name][0]
   ) : null
 }
+
 resource "null_resource" "create_project" {
   count = local.project_exists ? 0 : 1
-  triggers = {
-    always_run = timestamp()
-  }
 
   provisioner "local-exec" {
     command = <<-EOT
-      curl -X POST "${var.kheops_url}/projects" \
+      # Send POST request and capture output
+      response=$(curl -s -X POST "${var.kheops_url}/projects" \
         -H "Authorization: Bearer ${var.kheops_token}" \
         -H "Content-Type: application/json" \
         -d '{
           "name": "${var.project_name}",
           "description": "${var.project_description}",
           "is_public": ${var.is_public}
-        }'
+        }')
+
+      # Validate response
+      if ! echo "$response" | jq -e '.project_id' > /dev/null; then
+        echo "Failed to create project"
+        exit 1
+      fi
     EOT
+
+    interpreter = ["bash", "-c"]
   }
 }
+
 data "http" "project_creation_response" {
-  count  = local.project_exists ? 0 : 1
+  count = local.project_exists ? 0 : 1
   url    = "${var.kheops_url}/projects"
   method = "GET"
   request_headers = {
@@ -136,8 +149,9 @@ data "http" "project_creation_response" {
 }
 
 locals {
-  project_id_kheops_final = local.project_exists ? local.project_id_kheops : (
-  jsondecode(data.http.project_creation_response[0].response_body)[0].project_id
+  project_id_kheops_final = coalesce(
+    local.project_id_kheops,
+    try([for p in jsondecode(data.http.project_creation_response[0].response_body) : p.project_id if p.name == var.project_name][0], null)
   )
 }
 
