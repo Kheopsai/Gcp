@@ -21,3 +21,8 @@ variable "cloud_armor_security_policy_self_link" {
   description = "The self link of the Cloud Armor security policy"
   type        = string
 }
+
+variable "kheops_auth_token" {
+  description = "The auth token for the Kheops API"
+  type        = string
+}
