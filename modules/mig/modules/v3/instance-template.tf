@@ -1,8 +1,3 @@
-data "google_compute_image" "ubuntu" {
-  family  = "ubuntu-2204-lts"
-  project = "ubuntu-os-cloud"
-}
-
 resource "google_compute_instance_template" "mig-template" {
   # machine_type = "e2-highmem-4"
   machine_type = "e2-micro"
@@ -11,7 +6,7 @@ resource "google_compute_instance_template" "mig-template" {
   project      = var.project_id
 
   disk {
-    source_image = data.google_compute_image.ubuntu.self_link
+    source_image = "projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20250128"
     boot         = true
     auto_delete  = true
     # disk_size_gb = 100

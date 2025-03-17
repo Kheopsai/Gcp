@@ -1,8 +1,3 @@
-data "google_compute_image" "ubuntu" {
-  family  = "ubuntu-2204-lts"
-  project = "ubuntu-os-cloud"
-}
-
 resource "google_compute_instance_template" "mig-template" {
   # machine_type = "e2-highmem-4"
   machine_type = "e2-micro"
