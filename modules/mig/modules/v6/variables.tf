@@ -17,7 +17,12 @@ variable "subnet" {
   type        = string
 }
 
-variable "KHEOPS_AUTH_TOKEN" {
+variable "service_account_email" {
+  description = "The service account of the template"
+  type        = string
+}
+
+variable "kheops_auth_token" {
   description = "The auth token for the Kheops API"
   type        = string
 }

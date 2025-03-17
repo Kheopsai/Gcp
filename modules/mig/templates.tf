@@ -39,3 +39,13 @@ module "v5" {
   subnet                = var.subnet
   service_account_email = google_service_account.mig-sa.email
 }
+
+module "v6" {
+  source                = "./modules/v6"
+  project_id            = var.project_id
+  network               = var.network
+  region                = var.region
+  subnet                = var.subnet
+  service_account_email = google_service_account.mig-sa.email
+  kheops_auth_token     = var.kheops_auth_token
+}
