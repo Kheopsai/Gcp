@@ -17,7 +17,7 @@ variable "subnet" {
   type        = string
 }
 
-variable "KHEOPS_AUTH_TOKEN" {
+variable "kheops_auth_token" {
   description = "The auth token for the Kheops API"
   type        = string
 }

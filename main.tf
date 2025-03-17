@@ -10,7 +10,7 @@ module "mig" {
   network                               = var.network
   subnet                                = var.subnet
   cloud_armor_security_policy_self_link = module.armor.security_policy
-  kheops_auth_token                     = var.KHEOPS_AUTH_TOKEN
+  kheops_auth_token                     = var.kheops_auth_token
 }
 
 module "loadbalancer" {
