@@ -30,6 +30,9 @@ WEBSERVER="nginx"
 PHP_VERSION="8.2"
 DATABASE="none"
 
+# Get AUTH_TOKEN from metadata
+AUTH_TOKEN=$(get_metadata "attributes/AUTH_TOKEN")
+
 # API configuration
 API_BASE="https://kheops.cloud/api/projects/4"
 API_HEADERS=(
