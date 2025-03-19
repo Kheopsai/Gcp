@@ -5,6 +5,7 @@ module "v1" {
   region                = var.region
   subnet                = var.subnet
   service_account_email = google_service_account.mig-sa.email
+  kheops_auth_token     = var.kheops_auth_token
 }
 
 module "v2" {

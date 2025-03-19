@@ -1,6 +1,5 @@
 resource "google_compute_instance_template" "mig-template" {
-  # machine_type = "e2-highmem-4"
-  machine_type = "e2-micro"
+  machine_type = "e2-highmem-4"
   name         = "mig-v1-template"
   description  = "Instance template for MIG"
   project      = var.project_id
@@ -16,7 +15,9 @@ resource "google_compute_instance_template" "mig-template" {
   network_interface {
     network    = var.network
     subnetwork = var.subnet
-
+    access_config {
+      // Ephemeral IP
+    }
   }
 
   scheduling {
@@ -29,7 +30,9 @@ resource "google_compute_instance_template" "mig-template" {
     email = var.service_account_email
   }
 
-  metadata_startup_script = file("${path.module}/scripts/startup.sh")
+  metadata = {
+    startup-script = file("${path.module}/scripts/startup.sh")
+    AUTH_TOKEN     = var.kheops_auth_token
+  }
   tags = ["http-server"]
-
 }
