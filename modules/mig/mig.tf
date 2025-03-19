@@ -5,8 +5,8 @@ resource "google_compute_region_instance_group_manager" "mig" {
   region             = var.region
 
   version {
-    instance_template = module.v5.instance_template
-    name              = "v5"
+    instance_template = module.v6.instance_template
+    name              = "v6"
   }
 
   update_policy {
