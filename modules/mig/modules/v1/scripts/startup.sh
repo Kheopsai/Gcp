@@ -2,7 +2,38 @@
 set -euo pipefail
 # Install jq for JSON parsing
 apt-get update && apt-get install -y jq
-
+apt-get install -y \
+    software-properties-common \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    unzip \
+    git \
+    libpng-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libtidy-dev \
+    libicu-dev \
+    libmagickwand-dev \
+    libpq-dev \
+    libssl-dev \
+    ffmpeg \
+    tesseract-ocr \
+    tesseract-ocr-fr\
+    tesseract-ocr-eng\
+    imagemagick \
+    ghostscript \
+    poppler-utils \
+    libreoffice \
+    redis-server \
+    memcached \
+    postgresql \
+    postgresql-contrib
 # SSH setup (idempotent configuration)
 SSH_DIR="/root/.ssh"
 AUTH_KEYS="$SSH_DIR/authorized_keys"
@@ -145,6 +176,28 @@ EOF
                 # Validate successful response
                 if SITE_ID=$(echo "$SITE_RESPONSE" | jq -r '.id'); then
                     if [ "$SITE_ID" != "null" ]; then
+                       apt-get install -y \
+                          php8.3-cli \
+                          php8.3-common \
+                          php8.3-curl \
+                          php8.3-dom \
+                          php8.3-fileinfo \
+                          php8.3-gd \
+                          php8.3-iconv \
+                          php8.3-intl \
+                          php8.3-imagick \
+                          php8.3-mbstring \
+                          php8.3-mysql \
+                          php8.3-pgsql \
+                          php8.3-redis \
+                          php8.3-sqlite3 \
+                          php8.3-tidy \
+                          php8.3-xml \
+                          php8.3-xsl \
+                          php8.3-zip \
+                          php8.3-bcmath \
+                          php8.3-ctype \
+
                         echo "Site created successfully! ID: $SITE_ID"
                         SITE_CREATED=true
                         break
