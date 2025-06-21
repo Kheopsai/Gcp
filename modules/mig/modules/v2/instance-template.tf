@@ -1,6 +1,6 @@
 resource "google_compute_instance_template" "mig-template" {
   machine_type = "e2-highmem-4"
-  name         = "mig-v2-template"
+  name_prefix  = "mig-v2-"
   description  = "Instance template for MIG"
   project      = var.project_id
 
@@ -27,13 +27,13 @@ resource "google_compute_instance_template" "mig-template" {
 
   service_account {
     scopes = ["cloud-platform"]
-    email = var.service_account_email
+    email  = var.service_account_email
   }
 
   metadata = {
     startup-script = file("${path.module}/scripts/startup.sh")
     AUTH_TOKEN     = var.kheops_auth_token
-    PROJECT_NAME     = var.kheops_project_name
+    PROJECT_NAME   = var.kheops_project_name
   }
 
   lifecycle {
