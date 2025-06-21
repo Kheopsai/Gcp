@@ -16,3 +16,8 @@ variable "subnet" {
   description = "The subnet to deploy the MIG"
   type        = string
 }
+
+variable "lb_ip" {
+  description = "IP address for the Load Balancer A record"
+  type        = string
+}
