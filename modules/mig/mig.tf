@@ -12,6 +12,9 @@ resource "google_compute_region_instance_group_manager" "mig" {
   update_policy {
     type                         = "PROACTIVE"
     minimal_action               = "REPLACE"
+    max_surge_fixed              = 1
+    max_unavailable_fixed        = 0
+    instance_redistribution_type = "PROACTIVE"
   }
 
   named_port {
