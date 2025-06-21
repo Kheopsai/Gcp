@@ -1,6 +1,5 @@
 resource "google_compute_region_instance_group_manager" "mig" {
-  name = "mig"
-
+  name               = "mig"
   base_instance_name = "mig"
   region             = var.region
 
@@ -12,8 +11,8 @@ resource "google_compute_region_instance_group_manager" "mig" {
   update_policy {
     type                         = "PROACTIVE"
     minimal_action               = "REPLACE"
-    max_surge_fixed       = 0
-    max_unavailable_fixed = 1
+    max_surge_fixed              = 3
+    max_unavailable_fixed        = 0
     instance_redistribution_type = "PROACTIVE"
   }
 
@@ -26,8 +25,4 @@ resource "google_compute_region_instance_group_manager" "mig" {
     health_check      = google_compute_health_check.mig-health-check.id
     initial_delay_sec = 500
   }
-
-  wait_for_instances = true
 }
-
-
