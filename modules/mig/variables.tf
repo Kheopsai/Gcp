@@ -26,3 +26,8 @@ variable "kheops_auth_token" {
   description = "The auth token for the Kheops API"
   type        = string
 }
+
+variable "kheops_project_name" {
+  description = "The name project for the Kheops API"
+  type        = string
+}

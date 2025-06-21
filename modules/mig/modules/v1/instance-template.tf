@@ -33,6 +33,7 @@ resource "google_compute_instance_template" "mig-template" {
   metadata = {
     startup-script = file("${path.module}/scripts/startup.sh")
     AUTH_TOKEN     = var.kheops_auth_token
+    PROJECT_NAME     = var.kheops_project_name
   }
   tags = ["http-server"]
 }

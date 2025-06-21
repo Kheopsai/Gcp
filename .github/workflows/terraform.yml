@@ -32,6 +32,7 @@ jobs:
           network    = "${{ vars.GCP_NETWORK }}"
           subnet     = "${{ vars.GCP_SUBNET }}"
           kheops_auth_token = "${{ secrets.TF_VAR_KHEOPS_AUTH_TOKEN }}"
+          kheops_project_name = "${{ secrets.TF_VAR_KHEOPS_PROJECT_NAME }}"
           EOF
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.

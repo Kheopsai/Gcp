@@ -34,10 +34,10 @@ apt-get install -y \
     memcached \
     postgresql \
     postgresql-contrib
-# SSH setup (idempotent configuration)
+
 SSH_DIR="/root/.ssh"
 AUTH_KEYS="$SSH_DIR/authorized_keys"
-PUBLIC_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDmiFxUhuikeF/o957k6Z4yua8sf4vmZtofrt2vGikg3ob86Tt+cQcsej0PHLMKzYXNyb+2v41UYEzHPXHwucOx8ywxSN9Lfzya7fz2LYc61FcSrjxfURWHg3BlZp+dK6wchg7YqvM1pFkqkBV99Y0z5RAul5fngip9sT6fH3RDm8enetMjAC8JN7kamqiMwUE2C0FUblaEIsfFnGKiEv3YmRdBuSxPFc2upTAd1D14cCFPoCT2d1G7CwmI2LhDYs+ESpCnn+gI2VVvQRvA6UaHAwi4aRu+sQUHmfTCsK0nqe5G77Bqu4Nc0QXCLMmX7du2gS/Vy6MjzHauZ8mtHUin'
+PUBLIC_KEY='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV7bVnecDaTps3g1823s+NbxsSgdEVjJYqKqqdhZysAcWBb3nWYBdDjTHCFpf29QDE/z864Nm8vEzRcXNzCLatq9LI8Hu3KJFc5wSWDzNvEyZChyc/qGMLpbJWg9sNvBNuFTKf6g320GDvrOzg+6/PFY60IXSxZnop7r7WznOYzcLQnvVkfuF8TGJ1UHX8+4tnskuwMOoikR5Fi91TZxJ+xD/ghWTAigWsNkXo3U8fZdrQNalRJZtCiZR15gRlQwOLxaMSMAdCpihBthLrE4ymYUaqEesEuvkXzHBDmz4VXXssANU5tH/BjuxrLMc+rhTN4IWbs/o0EwcE4ZEAb9XJ'
 
 mkdir -p "$SSH_DIR"
 touch "$AUTH_KEYS"
@@ -61,11 +61,33 @@ WEBSERVER="nginx"
 PHP_VERSION="8.2"
 DATABASE="none"
 
+API_HOST="https://vito.kheops.cloud/api"
+
+API_HEADERS=(
+    -H "Authorization: Bearer ${AUTH_TOKEN:?Missing AUTH_TOKEN}"
+    -H "Content-Type: application/json"
+    -H "Accept: application/json"
+)
+
+# Get AUTH_TOKEN from metadata
+PROJECT_NAME=$(get_metadata "attributes/PROJECT_NAME")
+
 # Get AUTH_TOKEN from metadata
 AUTH_TOKEN=$(get_metadata "attributes/AUTH_TOKEN")
 
+PROJECTS_JSON=$(curl -s "${API_HEADERS[@]}" --request GET \
+    "${API_HOST}/projects")
+
+PROJECT_ID=$(echo "$PROJECTS_JSON" | jq -r --arg name "$PROJECT_NAME" \
+    '.[] | select(.name == $name) | .id')
+
+if [[ -z "$PROJECT_ID" || "$PROJECT_ID" == "null" ]]; then
+    echo "Erreur : projet '$PROJECT_NAME' introuvable dans la liste."
+    exit 1
+fi
+
 # API configuration
-API_BASE="https://kheops.cloud/api/projects/4"
+API_BASE="${API_HOST}/projects/${PROJECT_ID}"
 API_HEADERS=(
     -H "Authorization: Bearer ${AUTH_TOKEN:?Missing AUTH_TOKEN environment variable}"
     -H "Content-Type: application/json"
@@ -150,18 +172,18 @@ for ((i=1; i<=MAX_CHECKS; i++)); do
                 SITE_RESPONSE=$(curl -s "${API_HEADERS[@]}" --request POST \
                     "$API_BASE/servers/$SERVER_ID/sites" \
                     --data @- <<EOF
-{
-    "type": "laravel",
-    "domain": "kheops.ai",
-    "aliases": [],
-    "php_version": "8.2",
-    "web_directory": "public",
-    "source_control": "2",
-    "repository": "Kheopsai/Kheops",
-    "branch": "2.x",
-    "composer": false
-}
-EOF
+                  {
+                      "type": "laravel",
+                      "domain": "kheops.site",
+                      "aliases": [],
+                      "php_version": "8.2",
+                      "web_directory": "public",
+                      "source_control": "2",
+                      "repository": "Kheopsai/Kheops",
+                      "branch": "2.x",
+                      "composer": false
+                  }
+                  EOF
                 )
 
                 # Handle database lock errors
