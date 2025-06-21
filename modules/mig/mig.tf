@@ -22,7 +22,13 @@ resource "google_compute_region_instance_group_manager" "mig" {
     health_check      = google_compute_health_check.mig-health-check.id
     initial_delay_sec = 500
   }
-  wait_for_instances = true
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+  }
+
+  wait_for_instances = false
 }
 
 

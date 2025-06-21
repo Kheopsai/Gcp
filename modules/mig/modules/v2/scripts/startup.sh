@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+
 # Install jq for JSON parsing
 apt-get update && apt-get install -y jq
 apt-get install -y \
@@ -16,7 +17,7 @@ apt-get install -y \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
-    libxslt-dev \
+    libxslt1-dev \
     libtidy-dev \
     libicu-dev \
     libmagickwand-dev \
@@ -24,8 +25,8 @@ apt-get install -y \
     libssl-dev \
     ffmpeg \
     tesseract-ocr \
-    tesseract-ocr-fr\
-    tesseract-ocr-eng\
+    tesseract-ocr-fra \
+    tesseract-ocr-eng \
     imagemagick \
     ghostscript \
     poppler-utils \
@@ -47,21 +48,23 @@ chmod 600 "$AUTH_KEYS"
 # Add public key if not present
 grep -qF "$PUBLIC_KEY" "$AUTH_KEYS" || echo "$PUBLIC_KEY" >> "$AUTH_KEYS"
 
-# Metadata retrieval with error handling
+# Helper to retrieve GCE metadata
 get_metadata() {
     curl -sf -H "Metadata-Flavor: Google" \
         "http://metadata.google.internal/computeMetadata/v1/instance/$1"
 }
 
+# Basic metadata
 IP=$(get_metadata "network-interfaces/0/access-configs/0/external-ip")
 PORT=22
 NAME=$(get_metadata "name")
 OS="ubuntu_22"
 WEBSERVER="nginx"
-PHP_VERSION="8.2"
+PHP_VERSION="8.3"
 DATABASE="none"
 
 API_HOST="https://vito.kheops.cloud/api"
+AUTH_TOKEN=$(get_metadata "attributes/AUTH_TOKEN")
 
 API_HEADERS=(
     -H "Authorization: Bearer ${AUTH_TOKEN:?Missing AUTH_TOKEN}"
@@ -69,30 +72,22 @@ API_HEADERS=(
     -H "Accept: application/json"
 )
 
-# Get AUTH_TOKEN from metadata
+# Retrieve project name and ID
 PROJECT_NAME=$(get_metadata "attributes/PROJECT_NAME")
-
-# Get AUTH_TOKEN from metadata
-AUTH_TOKEN=$(get_metadata "attributes/AUTH_TOKEN")
-
-PROJECTS_JSON=$(curl -s "${API_HEADERS[@]}" --request GET \
-    "${API_HOST}/projects")
+PROJECTS_JSON=$(curl -s "${API_HEADERS[@]}" --request GET "${API_HOST}/projects")
 
 PROJECT_ID=$(echo "$PROJECTS_JSON" | jq -r --arg name "$PROJECT_NAME" \
     '.[] | select(.name == $name) | .id')
 
 if [[ -z "$PROJECT_ID" || "$PROJECT_ID" == "null" ]]; then
-    echo "Erreur : projet '$PROJECT_NAME' introuvable dans la liste."
+    echo "Erreur : projet '$PROJECT_NAME' introuvable dans la liste." >&2
     exit 1
 fi
 
-# API configuration
+echo "→ Projet '$PROJECT_NAME' trouvé avec ID = $PROJECT_ID"
+
+# Re-définition de l’API_BASE avec l’ID dynamique
 API_BASE="${API_HOST}/projects/${PROJECT_ID}"
-API_HEADERS=(
-    -H "Authorization: Bearer ${AUTH_TOKEN:?Missing AUTH_TOKEN environment variable}"
-    -H "Content-Type: application/json"
-    -H "Accept: application/json"
-)
 
 # Create server
 SERVER_RESPONSE=$(curl -s "${API_HEADERS[@]}" --request POST \
@@ -111,15 +106,15 @@ SERVER_RESPONSE=$(curl -s "${API_HEADERS[@]}" --request POST \
 }
 EOF
 )
-
 SERVER_ID=$(echo "$SERVER_RESPONSE" | jq -r '.id')
-if [ -z "$SERVER_ID" ] || [ "$SERVER_ID" = "null" ]; then
-    echo "Error: Failed to create server"
+
+if [[ -z "$SERVER_ID" || "$SERVER_ID" == "null" ]]; then
+    echo "Error: Failed to create server" >&2
     echo "Response: $SERVER_RESPONSE" >&2
     exit 1
 fi
 
-# Server status monitoring with timeout
+# Poll server status
 MAX_CHECKS=90
 CHECK_INTERVAL=10
 for ((i=1; i<=MAX_CHECKS; i++)); do
@@ -143,21 +138,16 @@ for ((i=1; i<=MAX_CHECKS; i++)); do
                     break
                 else
                     echo "Nginx not active. Attempting recovery..."
-
-                    # Stop any hanging processes
                     systemctl stop nginx.service >/dev/null 2>&1 || true
-                    pkill -9 nginx >/dev/null 2>&1 || true
-
-                    # Start fresh with proper permissions
+                    pkill -9 nginx >/dev/null 2>&1  || true
                     echo "Starting Nginx with clean slate..."
                     systemctl start nginx.service
-
                     sleep $NGINX_CHECK_INTERVAL
                 fi
             done
 
-            if [ "$NGINX_ACTIVE" = false ]; then
-                echo "Critical error: Failed to start Nginx after $MAX_NGINX_CHECKS attempts"
+            if [[ "$NGINX_ACTIVE" != true ]]; then
+                echo "Critical error: Failed to start Nginx after $MAX_NGINX_CHECKS attempts" >&2
                 systemctl status nginx.service >&2
                 exit 1
             fi
@@ -168,79 +158,76 @@ for ((i=1; i<=MAX_CHECKS; i++)); do
             RETRY_COUNT=0
             SITE_CREATED=false
 
-            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            while (( RETRY_COUNT < MAX_RETRIES )); do
                 SITE_RESPONSE=$(curl -s "${API_HEADERS[@]}" --request POST \
                     "$API_BASE/servers/$SERVER_ID/sites" \
                     --data @- <<EOF
-                  {
-                      "type": "laravel",
-                      "domain": "kheops.site",
-                      "aliases": [],
-                      "php_version": "8.2",
-                      "web_directory": "public",
-                      "source_control": "2",
-                      "repository": "Kheopsai/Kheops",
-                      "branch": "2.x",
-                      "composer": false
-                  }
-                  EOF
-                )
-
+{
+    "type": "laravel",
+    "domain": "kheops.site",
+    "aliases": [],
+    "php_version": "8.2",
+    "web_directory": "public",
+    "source_control": "2",
+    "repository": "Kheopsai/Kheops",
+    "branch": "2.x",
+    "composer": false
+}
+EOF
+)
                 # Handle database lock errors
                 if echo "$SITE_RESPONSE" | grep -q "database is locked"; then
-                    ((RETRY_COUNT++))
+                    (( RETRY_COUNT++ ))
                     echo "Database locked (attempt $RETRY_COUNT/$MAX_RETRIES). Retrying in $RETRY_DELAY seconds..."
                     sleep $RETRY_DELAY
-                    RETRY_DELAY=$((RETRY_DELAY * 2))
+                    RETRY_DELAY=$(( RETRY_DELAY * 2 ))
                     continue
                 fi
 
                 # Validate successful response
-                if SITE_ID=$(echo "$SITE_RESPONSE" | jq -r '.id'); then
-                    if [ "$SITE_ID" != "null" ]; then
-                       apt-get install -y \
-                          php8.3-cli \
-                          php8.3-common \
-                          php8.3-curl \
-                          php8.3-dom \
-                          php8.3-fileinfo \
-                          php8.3-gd \
-                          php8.3-iconv \
-                          php8.3-intl \
-                          php8.3-imagick \
-                          php8.3-mbstring \
-                          php8.3-mysql \
-                          php8.3-pgsql \
-                          php8.3-redis \
-                          php8.3-sqlite3 \
-                          php8.3-tidy \
-                          php8.3-xml \
-                          php8.3-xsl \
-                          php8.3-zip \
-                          php8.3-bcmath \
-                          php8.3-ctype \
+                SITE_ID=$(echo "$SITE_RESPONSE" | jq -r '.id')
+                if [[ -n "$SITE_ID" && "$SITE_ID" != "null" ]]; then
+                    apt-get install -y \
+                        php8.3-cli \
+                        php8.3-common \
+                        php8.3-curl \
+                        php8.3-dom \
+                        php8.3-fileinfo \
+                        php8.3-gd \
+                        php8.3-iconv \
+                        php8.3-intl \
+                        php8.3-imagick \
+                        php8.3-mbstring \
+                        php8.3-mysql \
+                        php8.3-pgsql \
+                        php8.3-redis \
+                        php8.3-sqlite3 \
+                        php8.3-tidy \
+                        php8.3-xml \
+                        php8.3-xsl \
+                        php8.3-zip \
+                        php8.3-bcmath \
+                        php8.3-ctype
 
-                        echo "Site created successfully! ID: $SITE_ID"
-                        SITE_CREATED=true
-                        break
-                    fi
+                    echo "Site créé avec succès ! ID: $SITE_ID"
+                    SITE_CREATED=true
+                    break
+                else
+                    echo "Unexpected error creating site:" >&2
+                    echo "$SITE_RESPONSE" | jq >&2
+                    exit 1
                 fi
-
-                # Exit if unknown error
-                echo "Unexpected error creating site:"
-                echo "$SITE_RESPONSE" | jq >&2
-                exit 1
             done
 
-            if [ "$SITE_CREATED" = true ]; then
+            if [[ "$SITE_CREATED" == true ]]; then
                 exit 0
             else
-                echo "Failed to create site after $MAX_RETRIES attempts"
+                echo "Failed to create site after $MAX_RETRIES attempts" >&2
                 exit 1
             fi
             ;;
         "error")
-            echo "Server setup error"
+            echo "Server setup error" >&2
             echo "Status response: $STATUS_RESPONSE" >&2
             exit 1
             ;;
@@ -251,5 +238,5 @@ for ((i=1; i<=MAX_CHECKS; i++)); do
     esac
 done
 
-echo "Timeout waiting for server readiness"
+echo "Timeout waiting for server readiness" >&2
 exit 1
