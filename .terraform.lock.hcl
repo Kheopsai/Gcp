@@ -5,6 +5,7 @@ provider "registry.terraform.io/cyrilgdn/postgresql" {
   version     = "1.25.0"
   constraints = "1.25.0"
   hashes = [
+    "h1:4Hlupc8gYrPnFKisesXs9lypK6LXslU4L4tjBZOhmiE=",
     "h1:pmiFgvrH1fA8CmhFCmIOkxHgBNpHWaRgx205AhBrl/A=",
     "zh:0f9db6e1274603d642e96b58eaf6cc4223f7118f2d7ce909dc4812d332cc002a",
     "zh:1819470f0304c6a60b2b51817cb43f6ff59a49e08cc9e50644b86b3a76c91601",
@@ -24,8 +25,10 @@ provider "registry.terraform.io/cyrilgdn/postgresql" {
 }
 
 provider "registry.terraform.io/hashicorp/google" {
-  version = "6.14.1"
+  version     = "6.14.1"
+  constraints = ">= 3.43.0, >= 4.74.0, >= 4.79.0, 6.14.1, < 7.0.0"
   hashes = [
+    "h1:AT+PPSH18DlJGqRS3I1tfSdJ6DwY0meBTYEo7NO0U/c=",
     "h1:jg4B8aevIeD2P/H6tnA+sfdwq9mmentFhksUU+FSR+w=",
     "zh:0a0cab3291bdac20fe31511b7aa9f3258b14add16d13110d4ebac18761277361",
     "zh:178594db6fbff9974a7c65c65195a64c93d16f652a1a4136015b192faaa1ce2d",
@@ -44,8 +47,9 @@ provider "registry.terraform.io/hashicorp/google" {
 
 provider "registry.terraform.io/hashicorp/google-beta" {
   version     = "6.14.1"
-  constraints = ">= 3.43.0, < 7.0.0"
+  constraints = ">= 3.43.0, >= 4.79.0, < 7.0.0"
   hashes = [
+    "h1:ilRCJYA7Z8rB62CzrK2dKEzDpSHQPJfM4yP2ibadehM=",
     "h1:oisaSFlA19BGvWDYotNJ7AUZFWcve4lmzOhnCLY9jJw=",
     "zh:0d744a644446bb1327b3b5dc3b1b4007ae9be75a819e0938b3bb226d5ede2f1f",
     "zh:0dcd29479c85fa8830da2e5085e5957d0a13e315004c81f3cfc25a94f0dbb398",
@@ -63,9 +67,11 @@ provider "registry.terraform.io/hashicorp/google-beta" {
 }
 
 provider "registry.terraform.io/hashicorp/local" {
-  version = "2.5.2"
+  version     = "2.5.2"
+  constraints = "2.5.2"
   hashes = [
     "h1:6NIiHWMbE9bFZaUiqC+OokdWSbW7g3+yQYnO4yvgtuY=",
+    "h1:JlMZD6nYqJ8sSrFfEAH0Vk/SL8WLZRmFaMUF9PJK5wM=",
     "zh:136299545178ce281c56f36965bf91c35407c11897f7082b3b983d86cb79b511",
     "zh:3b4486858aa9cb8163378722b642c57c529b6c64bfbfc9461d940a84cd66ebea",
     "zh:4855ee628ead847741aa4f4fc9bed50cfdbf197f2912775dd9fe7bc43fa077c0",
@@ -85,6 +91,7 @@ provider "registry.terraform.io/hashicorp/random" {
   version = "3.6.3"
   hashes = [
     "h1:+UItZOLue/moJfnI3tqZBQbXUYR4ZnqPYfJDJPgLZy0=",
+    "h1:Fnaec9vA8sZ8BXVlN3Xn9Jz3zghSETIKg7ch8oXhxno=",
     "zh:04ceb65210251339f07cd4611885d242cd4d0c7306e86dda9785396807c00451",
     "zh:448f56199f3e99ff75d5c0afacae867ee795e4dfda6cb5f8e3b2a72ec3583dd8",
     "zh:4b4c11ccfba7319e901df2dac836b1ae8f12185e37249e8d870ee10bb87a13fe",
