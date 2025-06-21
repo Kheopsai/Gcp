@@ -3,5 +3,5 @@ resource "google_dns_managed_zone" "default" {
   name          = "kheops-site"
   dns_name      = "kheops.site."
   description   = "Kheops Public DNS zone"
-  force_destroy = "false"
+  force_destroy = "true"
 }
