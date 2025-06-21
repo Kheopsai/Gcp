@@ -1,6 +1,6 @@
 resource "google_compute_instance_template" "mig-template" {
   machine_type = "e2-highmem-4"
-  name_prefix  = "mig-v2-"
+  name         = "mig-v2-template"
   description  = "Instance template for MIG"
   project      = var.project_id
 
