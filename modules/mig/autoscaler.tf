@@ -4,7 +4,7 @@ resource "google_compute_region_autoscaler" "mig-autoscaler" {
 
   autoscaling_policy {
     max_replicas    = 2
-    min_replicas    = 1
+    min_replicas    = 2
     cooldown_period = 60
 
     cpu_utilization {

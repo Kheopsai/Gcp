@@ -17,7 +17,7 @@ module "mig" {
 module "loadbalancer" {
   source                    = "./modules/loadbalancer"
   backend_service_id        = module.mig.backend_service_id
-  ssl_certificate_self_link = module.secrets.wildcard_kheops_ai
+  ssl_certificate_self_link = module.secrets.wildcard_kheops_site
 }
 
 module "memory_store" {

@@ -10,9 +10,10 @@ resource "google_compute_region_instance_group_manager" "mig" {
   }
 
   update_policy {
-    type           = "PROACTIVE"
-    minimal_action = "REPLACE"
+    type                         = "PROACTIVE"
+    minimal_action               = "REPLACE"
   }
+
   named_port {
     name = "http"
     port = 80
