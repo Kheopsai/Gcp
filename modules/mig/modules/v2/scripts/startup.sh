@@ -147,9 +147,9 @@ for ((i=1; i<=MAX_CHECKS; i++)); do
     "type": "laravel",
     "domain": "kheops.site",
     "aliases": [],
-    "php_version": "8.2",
+    "php_version": "8.3",
     "web_directory": "public",
-    "source_control": "2",
+    "source_control": "1",
     "repository": "Kheopsai/Kheops",
     "branch": "2.x",
     "composer": false
