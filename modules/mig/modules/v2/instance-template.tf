@@ -35,5 +35,9 @@ resource "google_compute_instance_template" "mig-template" {
     AUTH_TOKEN     = var.kheops_auth_token
     PROJECT_NAME     = var.kheops_project_name
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
   tags = ["http-server"]
 }
