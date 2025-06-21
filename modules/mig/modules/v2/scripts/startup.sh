@@ -1,40 +1,23 @@
 #!/bin/bash
 set -euo pipefail
 
-# Install jq for JSON parsing
-apt-get update && apt-get install -y jq
-apt-get install -y \
-    software-properties-common \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg \
-    unzip \
-    git \
-    libpng-dev \
-    libjpeg-dev \
-    libwebp-dev \
-    libzip-dev \
-    libonig-dev \
-    libxml2-dev \
-    libxslt1-dev \
-    libtidy-dev \
-    libicu-dev \
-    libmagickwand-dev \
-    libpq-dev \
-    libssl-dev \
-    ffmpeg \
-    tesseract-ocr \
-    tesseract-ocr-fra \
-    tesseract-ocr-eng \
-    imagemagick \
-    ghostscript \
-    poppler-utils \
-    libreoffice \
-    redis-server \
-    memcached \
-    postgresql \
-    postgresql-contrib
+# Force non-interactive installs
+export DEBIAN_FRONTEND=noninteractive
+APT_OPTS="-y \
+  -o Dpkg::Options::=--force-confdef \
+  -o Dpkg::Options::=--force-confold \
+  --allow-downgrades \
+  --allow-remove-essential \
+  --allow-change-held-packages"
+
+# Install jq for JSON parsing and other pre-reqs
+apt-get update
+apt-get install $APT_OPTS jq software-properties-common apt-transport-https \
+  ca-certificates curl gnupg unzip git libpng-dev libjpeg-dev libwebp-dev \
+  libzip-dev libonig-dev libxml2-dev libxslt1-dev libtidy-dev libicu-dev \
+  libmagickwand-dev libpq-dev libssl-dev ffmpeg tesseract-ocr \
+  tesseract-ocr-fra tesseract-ocr-eng imagemagick ghostscript poppler-utils \
+  libreoffice redis-server memcached postgresql postgresql-contrib
 
 SSH_DIR="/root/.ssh"
 AUTH_KEYS="$SSH_DIR/authorized_keys"
@@ -86,13 +69,11 @@ fi
 
 echo "→ Projet '$PROJECT_NAME' trouvé avec ID = $PROJECT_ID"
 
-# Re-définition de l’API_BASE avec l’ID dynamique
 API_BASE="${API_HOST}/projects/${PROJECT_ID}"
 
 # Create server
 SERVER_RESPONSE=$(curl -s "${API_HEADERS[@]}" --request POST \
-    "$API_BASE/servers" \
-    --data @- <<EOF
+    "$API_BASE/servers" --data @- <<EOF
 {
     "provider": "custom",
     "server_provider": "custom",
@@ -187,27 +168,12 @@ EOF
                 # Validate successful response
                 SITE_ID=$(echo "$SITE_RESPONSE" | jq -r '.id')
                 if [[ -n "$SITE_ID" && "$SITE_ID" != "null" ]]; then
-                    apt-get install -y \
-                        php8.3-cli \
-                        php8.3-common \
-                        php8.3-curl \
-                        php8.3-dom \
-                        php8.3-fileinfo \
-                        php8.3-gd \
-                        php8.3-iconv \
-                        php8.3-intl \
-                        php8.3-imagick \
-                        php8.3-mbstring \
-                        php8.3-mysql \
-                        php8.3-pgsql \
-                        php8.3-redis \
-                        php8.3-sqlite3 \
-                        php8.3-tidy \
-                        php8.3-xml \
-                        php8.3-xsl \
-                        php8.3-zip \
-                        php8.3-bcmath \
-                        php8.3-ctype
+                    # Install PHP extensions, non-interactively
+                    apt-get install $APT_OPTS \
+                        php8.3-cli php8.3-common php8.3-curl php8.3-dom php8.3-fileinfo \
+                        php8.3-gd php8.3-iconv php8.3-intl php8.3-imagick php8.3-mbstring \
+                        php8.3-mysql php8.3-pgsql php8.3-redis php8.3-sqlite3 php8.3-tidy \
+                        php8.3-xml php8.3-xsl php8.3-zip php8.3-bcmath php8.3-ctype
 
                     echo "Site créé avec succès ! ID: $SITE_ID"
                     SITE_CREATED=true

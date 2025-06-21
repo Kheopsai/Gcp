@@ -23,12 +23,7 @@ resource "google_compute_region_instance_group_manager" "mig" {
     initial_delay_sec = 500
   }
 
-  timeouts {
-    create = "30m"
-    update = "30m"
-  }
-
-  wait_for_instances = false
+  wait_for_instances = true
 }
 
 

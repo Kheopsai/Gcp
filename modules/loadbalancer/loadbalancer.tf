@@ -2,7 +2,7 @@ resource "google_compute_url_map" "mig-url-map" {
   name            = "mig-url-map"
   default_service = var.backend_service_id
   host_rule {
-    hosts = ["*.kheops.ai", "kheops.ai"]
+    hosts = ["*.kheops.site", "kheops.site"]
     path_matcher = "allpaths"
   }
 
