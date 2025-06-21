@@ -51,4 +51,5 @@ module "dns" {
   region     = var.region
   network    = var.network
   subnet     = var.subnet
+  lb_ip      = module.loadbalancer.lb_ip
 }
